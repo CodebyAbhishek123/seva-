@@ -1,0 +1,81 @@
+@import "tailwindcss";
+
+@theme {
+  --color-navy: #163A5F;
+  --color-navy-dark: #0F2742;
+  --color-navy-light: #235282;
+  --color-gov-blue: #1D4ED8;
+  --color-gov-blue-hover: #1E40AF;
+  --color-page-bg: #F4F6F8;
+  --color-surface: #FFFFFF;
+  --color-text-main: #172B3A;
+  --color-text-secondary: #5B6875;
+  --color-success: #18794E;
+  --color-success-bg: #EDFBF3;
+  --color-warning: #A15C00;
+  --color-warning-bg: #FEF7EC;
+  --color-critical: #B42318;
+  --color-critical-bg: #FEF3F2;
+  --color-border-neutral: #D9E0E7;
+  --color-border-subtle: #E5EAF0;
+}
+
+:root {
+  --background: #F4F6F8;
+  --foreground: #172B3A;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Government Portal Utilities */
+.gov-table th {
+  background-color: #F8FAFC;
+  color: #172B3A;
+  font-weight: 600;
+  text-align: left;
+  border-bottom: 1px solid #D9E0E7;
+  padding: 0.625rem 1rem;
+  font-size: 0.8125rem;
+  letter-spacing: 0.01em;
+}
+
+.gov-table td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #E5EAF0;
+  font-size: 0.875rem;
+  color: #172B3A;
+}
+
+.gov-table tr:hover td {
+  background-color: #F8FAFC;
+}
+
+/* Custom Scrollbar for operational panels */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #F1F4F8;
+}
+::-webkit-scrollbar-thumb {
+  background: #C4CDD5;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #9AA7B4;
+}
+
+/* Leaflet container fixes */
+.leaflet-container {
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+}
