@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { PageShell } from "@/components/layout/PageShell";
 import { StatWidget, Card } from "@/components/ui/Card";
@@ -28,12 +29,19 @@ import {
 } from "lucide-react";
 
 export default function DashboardPage() {
+  const router = useRouter();
   const { user, role } = useAuth();
   const [referrals, setReferrals] = useState<Referral[]>([]);
   const [facilities, setFacilities] = useState<Facility[]>([]);
   const [ambulances, setAmbulances] = useState<Ambulance[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [lastRefreshed, setLastRefreshed] = useState<string>("");
+
+  useEffect(() => {
+    if (role === "asha") {
+      router.replace("/dashboard/asha");
+    }
+  }, [role, router]);
 
   const loadData = async () => {
     setIsLoading(true);

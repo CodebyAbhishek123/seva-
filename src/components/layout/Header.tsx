@@ -38,8 +38,14 @@ export function Header({ onToggleSidebar, breadcrumbs = [] }: HeaderProps) {
   const handleRoleChange = (newRole: UserRole) => {
     switchRole(newRole);
     setRoleMenuOpen(false);
-    // If switching away from admin and on admin route, go to dashboard
+    // Role-based routing adjustments
     if (newRole !== "admin" && pathname.startsWith("/admin")) {
+      router.push("/dashboard");
+    }
+    if (newRole === "asha" && !pathname.startsWith("/dashboard/asha")) {
+      router.push("/dashboard/asha");
+    }
+    if (newRole !== "asha" && pathname.startsWith("/dashboard/asha")) {
       router.push("/dashboard");
     }
   };
@@ -104,13 +110,15 @@ export function Header({ onToggleSidebar, breadcrumbs = [] }: HeaderProps) {
                   ? "Hospital"
                   : role === "dispatcher"
                   ? "Dispatcher"
+                  : role === "asha"
+                  ? "ASHA Worker"
                   : "Admin"}
               </span>
               <ChevronDown className="w-3.5 h-3.5 text-white/70" />
             </button>
 
             {roleMenuOpen && (
-              <div className="absolute right-0 mt-2 w-56 bg-white text-[#172B3A] rounded-md shadow-lg border border-[#D9E0E7] py-1 z-50 text-xs animate-in fade-in zoom-in-95 duration-100">
+              <div className="absolute right-0 mt-2 w-60 bg-white text-[#172B3A] rounded-md shadow-lg border border-[#D9E0E7] py-1 z-50 text-xs animate-in fade-in zoom-in-95 duration-100">
                 <div className="px-3 py-1.5 border-b border-[#E5EAF0] text-[11px] font-semibold text-[#5B6875] uppercase tracking-wider">
                   Select Active Persona
                 </div>
@@ -137,6 +145,18 @@ export function Header({ onToggleSidebar, breadcrumbs = [] }: HeaderProps) {
                     <div className="text-[11px] text-[#5B6875]">Fleet dispatch & GPS tracking</div>
                   </div>
                   {role === "dispatcher" && <CheckCircle2 className="w-4 h-4 text-[#1D4ED8]" />}
+                </button>
+                <button
+                  onClick={() => handleRoleChange("asha")}
+                  className={`w-full text-left px-3 py-2 flex items-center justify-between hover:bg-[#F8FAFC] transition-colors ${
+                    role === "asha" ? "bg-blue-50 font-semibold text-[#1D4ED8]" : ""
+                  }`}
+                >
+                  <div>
+                    <div className="text-sm">ASHA Field Worker</div>
+                    <div className="text-[11px] text-[#5B6875]">Maternal tracking & Village SOS</div>
+                  </div>
+                  {role === "asha" && <CheckCircle2 className="w-4 h-4 text-[#1D4ED8]" />}
                 </button>
                 <button
                   onClick={() => handleRoleChange("admin")}

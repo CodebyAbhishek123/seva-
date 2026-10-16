@@ -159,5 +159,11 @@ export function RoleBadge({ role }: { role: UserRole }) {
           System Administrator
         </Badge>
       );
+    case "asha":
+      return (
+        <Badge variant="primary" size="sm">
+          ASHA Community Worker
+        </Badge>
+      );
   }
 }

@@ -15,6 +15,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Info,
+  HeartPulse,
 } from "lucide-react";
 
 interface SidebarProps {
@@ -35,7 +36,15 @@ export function Sidebar({
 
   const navigation = [
     {
-      name: "Dashboard",
+      name: "ASHA Field Dashboard",
+      href: "/dashboard/asha",
+      icon: HeartPulse,
+      roles: ["asha", "admin"],
+      exact: true,
+      badge: role === "asha" ? "Field" : undefined,
+    },
+    {
+      name: "Triage Dashboard",
       href: "/dashboard",
       icon: LayoutDashboard,
       roles: ["hospital", "dispatcher", "admin"],
@@ -45,33 +54,33 @@ export function Sidebar({
       name: "Referral Management",
       href: "/referrals",
       icon: GitPullRequest,
-      roles: ["hospital", "dispatcher", "admin"],
+      roles: ["hospital", "dispatcher", "admin", "asha"],
       badge: "Active",
     },
     {
       name: "Hospital Readiness",
       href: "/facilities/readiness",
       icon: BedDouble,
-      roles: ["hospital", "dispatcher", "admin"],
+      roles: ["hospital", "dispatcher", "admin", "asha"],
     },
     {
       name: "Facility Directory",
       href: "/facilities",
       icon: Building2,
-      roles: ["hospital", "dispatcher", "admin"],
+      roles: ["hospital", "dispatcher", "admin", "asha"],
     },
     {
       name: "Ambulance Operations",
       href: "/ambulances",
       icon: Ambulance,
-      roles: ["dispatcher", "hospital", "admin"],
+      roles: ["dispatcher", "hospital", "admin", "asha"],
       badge: role === "dispatcher" ? "Live" : undefined,
     },
     {
       name: "Notifications & Activity",
       href: "/activity",
       icon: History,
-      roles: ["hospital", "dispatcher", "admin"],
+      roles: ["hospital", "dispatcher", "admin", "asha"],
     },
     {
       name: "Administration",

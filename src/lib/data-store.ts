@@ -9,6 +9,8 @@ import {
   User,
   TripStage,
   FacilityReadiness,
+  AshaMotherRecord,
+  AncVisit,
 } from "@/types";
 import {
   MOCK_REFERRALS,
@@ -17,6 +19,7 @@ import {
   MOCK_ACTIVITY,
   MOCK_AUDIT_LOGS,
   MOCK_USERS,
+  MOCK_ASHA_MOTHERS,
 } from "./mock-data";
 
 const STORAGE_KEYS = {
@@ -25,6 +28,7 @@ const STORAGE_KEYS = {
   AMBULANCES: "maira_demo_ambulances",
   ACTIVITY: "maira_demo_activity",
   AUDIT: "maira_demo_audit",
+  ASHA_MOTHERS: "maira_demo_asha_mothers",
 };
 
 class DataStore {
@@ -526,6 +530,116 @@ class DataStore {
     return newLog;
   }
 
+  // --- ASHA MOTHERS ---
+  getAshaMothers(): AshaMotherRecord[] {
+    if (!this.isBrowser()) return MOCK_ASHA_MOTHERS;
+    const stored = localStorage.getItem(STORAGE_KEYS.ASHA_MOTHERS);
+    if (!stored) {
+      localStorage.setItem(STORAGE_KEYS.ASHA_MOTHERS, JSON.stringify(MOCK_ASHA_MOTHERS));
+      return MOCK_ASHA_MOTHERS;
+    }
+    try {
+      return JSON.parse(stored);
+    } catch {
+      return MOCK_ASHA_MOTHERS;
+    }
+  }
+
+  getAshaMotherById(id: string): AshaMotherRecord | undefined {
+    return this.getAshaMothers().find((m) => m.id === id || m.rchId === id);
+  }
+
+  addAshaMother(mother: AshaMotherRecord): AshaMotherRecord {
+    const list = this.getAshaMothers();
+    list.unshift(mother);
+    if (this.isBrowser()) {
+      localStorage.setItem(STORAGE_KEYS.ASHA_MOTHERS, JSON.stringify(list));
+      window.dispatchEvent(new Event("maira_store_updated"));
+    }
+    this.logActivity({
+      eventType: "REFERRAL_CREATED",
+      title: "New Pregnant Mother Registered",
+      description: `RCH ID: ${mother.rchId} (${mother.name}, ${mother.age}y, ${mother.village}) registered by ${mother.assignedAshaName}`,
+      actorId: mother.assignedAshaId,
+      actorName: mother.assignedAshaName,
+      actorRole: "asha",
+      timestamp: new Date().toISOString(),
+      dispatchChannels: { inApp: true, smsDelivered: true, ivrTriggered: false },
+    });
+    return mother;
+  }
+
+  updateAshaMother(mother: AshaMotherRecord): AshaMotherRecord {
+    const list = this.getAshaMothers();
+    const index = list.findIndex((m) => m.id === mother.id);
+    if (index >= 0) {
+      list[index] = mother;
+    } else {
+      list.unshift(mother);
+    }
+    if (this.isBrowser()) {
+      localStorage.setItem(STORAGE_KEYS.ASHA_MOTHERS, JSON.stringify(list));
+      window.dispatchEvent(new Event("maira_store_updated"));
+    }
+    return mother;
+  }
+
+  recordAncVisit(motherId: string, visit: AncVisit): AshaMotherRecord | null {
+    const mother = this.getAshaMotherById(motherId);
+    if (!mother) return null;
+
+    const existingVisits = mother.ancVisits.filter((v) => v.visitNumber !== visit.visitNumber);
+    const updatedVisits = [...existingVisits, visit].sort((a, b) => a.visitNumber - b.visitNumber);
+
+    const isHighRiskNow = mother.isHighRisk || (visit.highRiskIdentified ?? false) || visit.bpSystolic >= 140 || visit.bpDiastolic >= 90 || visit.hemoglobin < 7;
+    const newReasons = [...mother.highRiskReasons];
+    if ((visit.bpSystolic >= 140 || visit.bpDiastolic >= 90) && !newReasons.some((r) => r.includes("Hypertension"))) {
+      newReasons.push(`Hypertension (BP ${visit.bpSystolic}/${visit.bpDiastolic})`);
+    }
+    if (visit.hemoglobin < 7 && !newReasons.some((r) => r.includes("Anemia"))) {
+      newReasons.push(`Severe Anemia (Hb ${visit.hemoglobin} g/dL)`);
+    }
+
+    const updatedMother: AshaMotherRecord = {
+      ...mother,
+      isHighRisk: isHighRiskNow,
+      highRiskReasons: newReasons,
+      currentVitals: {
+        bpSystolic: visit.bpSystolic,
+        bpDiastolic: visit.bpDiastolic,
+        hemoglobin: visit.hemoglobin,
+        weightKg: visit.weightKg,
+        fetalHeartRate: visit.fetalHeartRate,
+      },
+      ancVisits: updatedVisits,
+      tabletsIssued: {
+        ifaCount: mother.tabletsIssued.ifaCount + visit.ifaTabletsGiven,
+        calciumCount: mother.tabletsIssued.calciumCount + visit.calciumTabletsGiven,
+      },
+      immunizationStatus: {
+        ...mother.immunizationStatus,
+        tt1: visit.ttDose === "TT1" ? true : mother.immunizationStatus.tt1,
+        tt2: visit.ttDose === "TT2" ? true : mother.immunizationStatus.tt2,
+        booster: visit.ttDose === "BOOSTER" ? true : mother.immunizationStatus.booster,
+      },
+    };
+
+    this.updateAshaMother(updatedMother);
+
+    this.logActivity({
+      eventType: "READINESS_UPDATED",
+      title: `ANC Visit ${visit.visitNumber} Logged`,
+      description: `ANC ${visit.visitNumber} recorded for ${mother.name} (${mother.rchId}). BP: ${visit.bpSystolic}/${visit.bpDiastolic}, Hb: ${visit.hemoglobin} g/dL.`,
+      actorId: mother.assignedAshaId,
+      actorName: mother.assignedAshaName,
+      actorRole: "asha",
+      timestamp: new Date().toISOString(),
+      dispatchChannels: { inApp: true, smsDelivered: true, ivrTriggered: false },
+    });
+
+    return updatedMother;
+  }
+
   resetDemoData(): void {
     if (this.isBrowser()) {
       localStorage.removeItem(STORAGE_KEYS.REFERRALS);
@@ -533,6 +647,7 @@ class DataStore {
       localStorage.removeItem(STORAGE_KEYS.AMBULANCES);
       localStorage.removeItem(STORAGE_KEYS.ACTIVITY);
       localStorage.removeItem(STORAGE_KEYS.AUDIT);
+      localStorage.removeItem(STORAGE_KEYS.ASHA_MOTHERS);
       window.dispatchEvent(new Event("maira_store_updated"));
     }
   }

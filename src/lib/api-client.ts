@@ -7,6 +7,8 @@ import {
   TripStage,
   FacilityReadiness,
   ActivityEvent,
+  AshaMotherRecord,
+  AncVisit,
 } from "@/types";
 import { dataStore } from "./data-store";
 
@@ -299,6 +301,19 @@ export class MairaApiClient {
       if (res.data) return res.data;
     }
     return dataStore.getActivity();
+  }
+
+  // --- ASHA WORKER PORTAL ---
+  async getAshaMothers(): Promise<AshaMotherRecord[]> {
+    return dataStore.getAshaMothers();
+  }
+
+  async addAshaMother(payload: AshaMotherRecord): Promise<AshaMotherRecord> {
+    return dataStore.addAshaMother(payload);
+  }
+
+  async recordAncVisit(motherId: string, visit: AncVisit): Promise<AshaMotherRecord | null> {
+    return dataStore.recordAncVisit(motherId, visit);
   }
 }
 

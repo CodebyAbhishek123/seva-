@@ -6,17 +6,25 @@ import { useAuth } from "@/lib/auth-context";
 
 export default function HomePage() {
   const router = useRouter();
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, role } = useAuth();
 
   useEffect(() => {
     if (!isLoading) {
       if (isAuthenticated) {
-        router.replace("/dashboard");
+        if (role === "asha") {
+          router.replace("/dashboard/asha");
+        } else if (role === "dispatcher") {
+          router.replace("/ambulances");
+        } else if (role === "admin") {
+          router.replace("/admin");
+        } else {
+          router.replace("/dashboard");
+        }
       } else {
         router.replace("/login");
       }
     }
-  }, [isAuthenticated, isLoading, router]);
+  }, [isAuthenticated, isLoading, role, router]);
 
   return (
     <div className="min-h-screen bg-[#F4F6F8] flex items-center justify-center">

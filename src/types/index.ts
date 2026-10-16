@@ -1,4 +1,4 @@
-export type UserRole = "hospital" | "dispatcher" | "admin";
+export type UserRole = "hospital" | "dispatcher" | "admin" | "asha";
 
 export interface User {
   id: string;
@@ -10,6 +10,73 @@ export interface User {
   facilityName?: string;
   phone: string;
   lastLogin?: string;
+}
+
+export interface AncVisit {
+  id: string;
+  visitNumber: 1 | 2 | 3 | 4;
+  date: string;
+  gestationalWeeks: number;
+  weightKg: number;
+  bpSystolic: number;
+  bpDiastolic: number;
+  hemoglobin: number;
+  fundalHeightCm?: number;
+  fetalHeartRate?: number;
+  urineAlbumin?: "NIL" | "TRACE" | "1+" | "2+" | "3+";
+  ifaTabletsGiven: number;
+  calciumTabletsGiven: number;
+  ttDose?: "TT1" | "TT2" | "BOOSTER" | "NONE";
+  highRiskIdentified?: boolean;
+  notes?: string;
+}
+
+export interface AshaMotherRecord {
+  id: string;
+  rchId: string;
+  name: string;
+  husbandName: string;
+  age: number;
+  contactPhone: string;
+  village: string;
+  wardNumber: string;
+  gravida: number;
+  para: number;
+  bloodGroup: string;
+  lmpDate: string;
+  eddDate: string;
+  gestationalWeeks: number;
+  isHighRisk: boolean;
+  highRiskReasons: string[];
+  currentVitals: {
+    bpSystolic: number;
+    bpDiastolic: number;
+    hemoglobin: number;
+    weightKg: number;
+    fetalHeartRate?: number;
+  };
+  ancVisits: AncVisit[];
+  immunizationStatus: {
+    tt1: boolean;
+    tt2: boolean;
+    booster: boolean;
+  };
+  tabletsIssued: {
+    ifaCount: number;
+    calciumCount: number;
+  };
+  assignedAshaId: string;
+  assignedAshaName: string;
+  activeReferralId?: string;
+  deliveryStatus: "PREGNANT" | "DELIVERED" | "TRANSFERRED";
+  deliveryDetails?: {
+    date: string;
+    facilityName: string;
+    deliveryType: "NORMAL" | "C_SECTION" | "ASSISTED";
+    outcome: "HEALTHY" | "SNCU_ADMISSION" | "COMPLICATIONS";
+    jsyIncentiveStatus: "PENDING" | "APPROVED" | "DISBURSED";
+  };
+  registeredDate: string;
 }
 
 export type UrgencyLevel = "CRITICAL" | "HIGH" | "NORMAL";

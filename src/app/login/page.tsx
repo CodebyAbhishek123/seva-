@@ -15,6 +15,7 @@ import {
   Ambulance,
   ShieldCheck,
   Check,
+  HeartPulse,
 } from "lucide-react";
 
 export default function LoginPage() {
@@ -37,7 +38,16 @@ export default function LoginPage() {
     setIsLoading(false);
 
     if (res.success) {
-      router.push("/dashboard");
+      const activeRole = res.role || selectedRole;
+      if (activeRole === "asha") {
+        router.push("/dashboard/asha");
+      } else if (activeRole === "dispatcher") {
+        router.push("/ambulances");
+      } else if (activeRole === "admin") {
+        router.push("/admin");
+      } else {
+        router.push("/dashboard");
+      }
     } else {
       setError(res.error || "Authentication failed. Check credentials.");
     }
@@ -70,7 +80,7 @@ export default function LoginPage() {
 
       {/* Main Login Card Container */}
       <div className="flex-1 flex items-center justify-center p-4 sm:p-6">
-        <div className="w-full max-w-md bg-white border border-[#D9E0E7] rounded-lg shadow-sm overflow-hidden">
+        <div className="w-full max-w-lg bg-white border border-[#D9E0E7] rounded-lg shadow-sm overflow-hidden">
           {/* Card Header with Wordmark */}
           <div className="p-6 sm:p-8 bg-[#F8FAFC] border-b border-[#E5EAF0] text-center">
             <div className="inline-flex items-center justify-center w-12 h-12 rounded-lg bg-[#163A5F] text-white shadow-xs mb-3">
@@ -82,41 +92,42 @@ export default function LoginPage() {
             <p className="text-xs font-semibold text-[#1D4ED8] uppercase tracking-wider mt-0.5">
               Maternal & Infant Referral Assistance
             </p>
-            <p className="text-xs text-[#5B6875] mt-2 max-w-xs mx-auto">
-              Secure Operations Portal for Hospitals, Obstetricians & 108 Emergency Ambulance Dispatch
+            <p className="text-xs text-[#5B6875] mt-2 max-w-sm mx-auto">
+              Secure Operations Portal for Hospitals, Obstetricians, ASHA Community Health Workers & 108 Emergency Ambulance Dispatch
             </p>
           </div>
 
           {/* Demo Mode Role Quick Selectors */}
           {isDemoMode && (
-            <div className="px-6 pt-5 pb-1 bg-amber-50/50 border-b border-amber-200/50">
+            <div className="px-6 pt-5 pb-3 bg-amber-50/50 border-b border-amber-200/50">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-[11px] font-bold uppercase tracking-wider text-[#A15C00]">
-                  Evaluation & Drill Credentials:
+                  Evaluation & Role-Based Login:
                 </span>
                 <span className="text-[10px] bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded font-medium">
                   Select Role
                 </span>
               </div>
-              <div className="grid grid-cols-3 gap-2 pb-3">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 <button
                   type="button"
                   onClick={() =>
                     handleSelectDemoProfile("hospital", "doctor@dwh.gov.in")
                   }
-                  className={`p-2 text-left rounded border transition-all text-xs ${
+                  className={`p-2.5 text-left rounded border transition-all text-xs ${
                     selectedRole === "hospital"
-                      ? "border-[#1D4ED8] bg-blue-50 text-[#1D4ED8] font-semibold"
+                      ? "border-[#1D4ED8] bg-blue-50 text-[#1D4ED8] font-semibold ring-1 ring-[#1D4ED8]"
                       : "border-[#D9E0E7] bg-white text-[#5B6875] hover:border-slate-400"
                   }`}
                 >
                   <div className="flex items-center justify-between">
-                    <Building2 className="w-3.5 h-3.5 shrink-0" />
+                    <Building2 className="w-4 h-4 shrink-0" />
                     {selectedRole === "hospital" && (
-                      <Check className="w-3 h-3 text-[#1D4ED8]" />
+                      <Check className="w-3.5 h-3.5 text-[#1D4ED8]" />
                     )}
                   </div>
-                  <div className="mt-1 font-medium leading-tight">Hospital / Doctor</div>
+                  <div className="mt-1.5 font-medium leading-tight">Hospital / Doctor</div>
+                  <div className="text-[10px] text-slate-500 mt-0.5">Triage & Handover</div>
                 </button>
 
                 <button
@@ -124,19 +135,41 @@ export default function LoginPage() {
                   onClick={() =>
                     handleSelectDemoProfile("dispatcher", "dispatch@erc108.gov.in")
                   }
-                  className={`p-2 text-left rounded border transition-all text-xs ${
+                  className={`p-2.5 text-left rounded border transition-all text-xs ${
                     selectedRole === "dispatcher"
-                      ? "border-[#1D4ED8] bg-blue-50 text-[#1D4ED8] font-semibold"
+                      ? "border-[#1D4ED8] bg-blue-50 text-[#1D4ED8] font-semibold ring-1 ring-[#1D4ED8]"
                       : "border-[#D9E0E7] bg-white text-[#5B6875] hover:border-slate-400"
                   }`}
                 >
                   <div className="flex items-center justify-between">
-                    <Ambulance className="w-3.5 h-3.5 shrink-0" />
+                    <Ambulance className="w-4 h-4 shrink-0" />
                     {selectedRole === "dispatcher" && (
-                      <Check className="w-3 h-3 text-[#1D4ED8]" />
+                      <Check className="w-3.5 h-3.5 text-[#1D4ED8]" />
                     )}
                   </div>
-                  <div className="mt-1 font-medium leading-tight">108 Dispatcher</div>
+                  <div className="mt-1.5 font-medium leading-tight">108 Dispatcher</div>
+                  <div className="text-[10px] text-slate-500 mt-0.5">Fleet & GPS</div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    handleSelectDemoProfile("asha", "kamlesh.asha@nhm.gov.in")
+                  }
+                  className={`p-2.5 text-left rounded border transition-all text-xs ${
+                    selectedRole === "asha"
+                      ? "border-emerald-600 bg-emerald-50 text-emerald-800 font-semibold ring-1 ring-emerald-600"
+                      : "border-[#D9E0E7] bg-white text-[#5B6875] hover:border-slate-400"
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <HeartPulse className="w-4 h-4 text-emerald-600 shrink-0" />
+                    {selectedRole === "asha" && (
+                      <Check className="w-3.5 h-3.5 text-emerald-700" />
+                    )}
+                  </div>
+                  <div className="mt-1.5 font-medium leading-tight">ASHA Worker</div>
+                  <div className="text-[10px] text-emerald-700 mt-0.5">ANC & Village SOS</div>
                 </button>
 
                 <button
@@ -144,19 +177,20 @@ export default function LoginPage() {
                   onClick={() =>
                     handleSelectDemoProfile("admin", "admin@nrhm.gov.in")
                   }
-                  className={`p-2 text-left rounded border transition-all text-xs ${
+                  className={`p-2.5 text-left rounded border transition-all text-xs ${
                     selectedRole === "admin"
-                      ? "border-[#1D4ED8] bg-blue-50 text-[#1D4ED8] font-semibold"
+                      ? "border-[#1D4ED8] bg-blue-50 text-[#1D4ED8] font-semibold ring-1 ring-[#1D4ED8]"
                       : "border-[#D9E0E7] bg-white text-[#5B6875] hover:border-slate-400"
                   }`}
                 >
                   <div className="flex items-center justify-between">
-                    <ShieldCheck className="w-3.5 h-3.5 shrink-0" />
+                    <ShieldCheck className="w-4 h-4 shrink-0" />
                     {selectedRole === "admin" && (
-                      <Check className="w-3 h-3 text-[#1D4ED8]" />
+                      <Check className="w-3.5 h-3.5 text-[#1D4ED8]" />
                     )}
                   </div>
-                  <div className="mt-1 font-medium leading-tight">Administrator</div>
+                  <div className="mt-1.5 font-medium leading-tight">Administrator</div>
+                  <div className="text-[10px] text-slate-500 mt-0.5">Audit & Roles</div>
                 </button>
               </div>
             </div>

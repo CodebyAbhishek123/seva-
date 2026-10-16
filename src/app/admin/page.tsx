@@ -203,6 +203,7 @@ export default function AdminPage() {
                           <option value="hospital">Hospital / Doctor</option>
                           <option value="dispatcher">108 Dispatcher</option>
                           <option value="admin">System Administrator</option>
+                          <option value="asha">ASHA Community Worker</option>
                         </select>
                       </td>
                     </tr>

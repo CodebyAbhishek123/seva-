@@ -4,16 +4,31 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import { User, UserRole } from "@/types";
 import { MOCK_USERS } from "./mock-data";
 
+export function getDefaultRouteForRole(role: UserRole): string {
+  switch (role) {
+    case "asha":
+      return "/dashboard/asha";
+    case "dispatcher":
+      return "/ambulances";
+    case "admin":
+      return "/admin";
+    case "hospital":
+    default:
+      return "/dashboard";
+  }
+}
+
 interface AuthContextType {
   user: User | null;
   role: UserRole | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   isDemoMode: boolean;
-  login: (email: string, password: string, roleOverride?: UserRole) => Promise<{ success: boolean; error?: string }>;
+  login: (email: string, password: string, roleOverride?: UserRole) => Promise<{ success: boolean; error?: string; role?: UserRole }>;
   logout: () => void;
   switchRole: (role: UserRole) => void;
   canAccess: (allowedRoles: UserRole[]) => boolean;
+  getDefaultRoute: () => string;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -47,7 +62,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     email: string,
     password: string,
     roleOverride?: UserRole
-  ): Promise<{ success: boolean; error?: string }> => {
+  ): Promise<{ success: boolean; error?: string; role?: UserRole }> => {
     setIsLoading(true);
     // Simulate brief authentication check
     await new Promise((r) => setTimeout(r, 450));
@@ -70,22 +85,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return { success: false, error: "Invalid password. Passwords must be at least 6 characters." };
     }
 
+    const determinedRole = roleOverride || (email.toLowerCase().includes("asha") ? "asha" : matchedUser?.role || "hospital");
+
     const authenticatedUser: User = matchedUser || {
       id: `usr-${Date.now()}`,
       name: email.split("@")[0].replace(".", " "),
       email,
-      role: roleOverride || "hospital",
-      designation: "Authorized Healthcare Officer",
+      role: determinedRole,
+      designation: determinedRole === "asha" ? "Accredited Social Health Activist (ASHA)" : "Authorized Healthcare Officer",
       phone: "+91 90000 00000",
-      facilityId: "FAC-DH-01",
-      facilityName: "District Women & Child Hospital, Central",
+      facilityId: determinedRole === "asha" ? "FAC-CHC-04" : "FAC-DH-01",
+      facilityName: determinedRole === "asha" ? "Najafgarh Community Health Centre" : "District Women & Child Hospital, Central",
       lastLogin: new Date().toISOString(),
     };
 
     setUser(authenticatedUser);
     sessionStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(authenticatedUser));
     setIsLoading(false);
-    return { success: true };
+    return { success: true, role: authenticatedUser.role };
   };
 
   const logout = () => {
@@ -122,6 +139,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         logout,
         switchRole,
         canAccess,
+        getDefaultRoute: () => (user ? getDefaultRouteForRole(user.role) : "/login"),
       }}
     >
       {children}
