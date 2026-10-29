@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/Button";
@@ -9,7 +10,6 @@ import {
   Shield,
   Eye,
   EyeOff,
-  Cross,
   AlertCircle,
   Building2,
   Ambulance,
@@ -83,8 +83,15 @@ export default function LoginPage() {
         <div className="w-full max-w-lg bg-white border border-[#D9E0E7] rounded-lg shadow-sm overflow-hidden">
           {/* Card Header with Wordmark */}
           <div className="p-6 sm:p-8 bg-[#F8FAFC] border-b border-[#E5EAF0] text-center">
-            <div className="inline-flex items-center justify-center w-12 h-12 rounded-lg bg-[#163A5F] text-white shadow-xs mb-3">
-              <Cross className="w-7 h-7 text-emerald-400 rotate-45" />
+            <div className="relative w-24 h-24 mx-auto mb-3 rounded-full overflow-hidden shadow-md ring-4 ring-[#163A5F]/10 border border-[#D9E0E7] bg-white transition-transform hover:scale-105 duration-300">
+              <Image
+                src="/maira-logo.png"
+                alt="MAIRA Official Emblem"
+                width={96}
+                height={96}
+                className="w-full h-full object-cover"
+                priority
+              />
             </div>
             <h1 className="text-2xl font-bold tracking-tight text-[#163A5F]">
               MAIRA

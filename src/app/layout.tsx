@@ -6,6 +6,10 @@ export const metadata: Metadata = {
   title: "MAIRA — Maternal & Infant Referral Assistance",
   description:
     "Government Healthcare Referral & Emergency Ambulance Coordination Operational Portal for Maternal & Neonatal Health.",
+  icons: {
+    icon: "/maira-icon.png",
+    apple: "/maira-icon.png",
+  },
 };
 
 export default function RootLayout({

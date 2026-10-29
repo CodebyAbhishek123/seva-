@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import {
@@ -12,7 +13,6 @@ import {
   Menu,
   ShieldAlert,
   User as UserIcon,
-  Cross,
   CheckCircle2,
 } from "lucide-react";
 import { RoleBadge } from "@/components/ui/Badge";
@@ -64,13 +64,20 @@ export function Header({ onToggleSidebar, breadcrumbs = [] }: HeaderProps) {
             <Menu className="w-5 h-5" />
           </button>
 
-          <Link href="/dashboard" className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded bg-white/10 border border-white/20 flex items-center justify-center shrink-0">
-              <Cross className="w-5 h-5 text-emerald-400 rotate-45" />
+          <Link href="/dashboard" className="flex items-center gap-2.5 group">
+            <div className="relative w-9 h-9 rounded-full overflow-hidden border border-white/30 shadow-xs shrink-0 bg-white group-hover:scale-105 transition-transform flex items-center justify-center">
+              <Image
+                src="/maira-logo.png"
+                alt="MAIRA Official Emblem"
+                width={36}
+                height={36}
+                className="w-full h-full object-cover"
+                priority
+              />
             </div>
             <div className="flex flex-col">
               <div className="flex items-center gap-2">
-                <span className="font-bold text-base tracking-wider text-white">
+                <span className="font-bold text-base tracking-wider text-white group-hover:text-emerald-300 transition-colors">
                   MAIRA
                 </span>
                 <span className="text-[10px] uppercase font-semibold px-1.5 py-0.2 rounded bg-white/15 text-white/90 border border-white/20">
